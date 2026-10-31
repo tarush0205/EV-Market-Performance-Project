@@ -1,0 +1,613 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Electric Vehicle Market Performance and Insights, an interactive EV analytics dashboard built with Tableau Public.">
+
+    <title>EV Insights | Electric Vehicle Analytics</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 85px;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f8f6;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #102b23;
+            color: white;
+            padding: 18px 7%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: #72f0ad;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 18px;
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            color: #72f0ad;
+        }
+
+        .hero {
+            min-height: 450px;
+            padding: 90px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #102b23, #176b4d);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 6px 14px;
+            border: 1px solid #72f0ad;
+            border-radius: 25px;
+            color: #72f0ad;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .hero h1 {
+            font-size: clamp(32px, 5vw, 54px);
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            max-width: 760px;
+            margin: 0 auto 25px;
+            color: #e0f2e8;
+            font-size: 17px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 23px;
+            margin: 5px;
+            border-radius: 7px;
+            background: #72f0ad;
+            color: #102b23;
+            text-decoration: none;
+            font-weight: bold;
+            border: 1px solid #72f0ad;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background: #43d98b;
+            transform: translateY(-2px);
+        }
+
+        .button-outline {
+            background: transparent;
+            color: white;
+        }
+
+        .button-outline:hover {
+            color: #102b23;
+        }
+
+        section {
+            padding: 65px 7%;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 32px;
+            color: #102b23;
+            margin-bottom: 12px;
+        }
+
+        .section-description {
+            max-width: 750px;
+            text-align: center;
+            color: #64748b;
+            margin: 0 auto 35px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 22px;
+        }
+
+        .card {
+            background: white;
+            padding: 27px;
+            border-radius: 12px;
+            border: 1px solid #e0e9e3;
+            box-shadow: 0 5px 18px rgba(16, 43, 35, 0.06);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card .icon {
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .card h3 {
+            color: #176b4d;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-section {
+            background: #eaf3ed;
+        }
+
+        .dashboard-panel {
+            max-width: 1500px;
+            margin: auto;
+            padding: 22px;
+            background: white;
+            border-radius: 14px;
+            border: 1px solid #d8e6dc;
+            box-shadow: 0 8px 28px rgba(16, 43, 35, 0.08);
+        }
+
+        .dashboard-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .dashboard-heading h3 {
+            color: #102b23;
+            font-size: 22px;
+        }
+
+        .status {
+            color: #176b4d;
+            background: #e2f8eb;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Tableau dashboard container */
+        .tableau-container {
+            width: 100%;
+            min-height: 600px;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #f8faf9;
+        }
+
+        .tableauPlaceholder {
+            position: relative;
+            width: 100%;
+        }
+
+        .tableauViz {
+            display: block;
+            width: 100%;
+            min-height: 650px;
+        }
+
+        .dashboard-note {
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 16px;
+        }
+
+        .about-box {
+            max-width: 900px;
+            margin: auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e0e9e3;
+            box-shadow: 0 5px 18px rgba(16, 43, 35, 0.04);
+        }
+
+        .about-box p + p {
+            margin-top: 15px;
+        }
+
+        .project-details {
+            margin-top: 22px;
+            padding: 18px;
+            background: #eaf3ed;
+            border-radius: 8px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 15px;
+            background: #102b23;
+            color: #d9e8df;
+        }
+
+        footer strong {
+            color: #72f0ad;
+        }
+
+        footer a {
+            color: #72f0ad;
+            text-decoration: none;
+        }
+
+        @media (max-width: 650px) {
+            header {
+                padding: 16px 5%;
+            }
+
+            nav {
+                justify-content: center;
+            }
+
+            nav a {
+                display: inline-block;
+                margin: 5px 7px;
+            }
+
+            section {
+                padding: 45px 5%;
+            }
+
+            .hero {
+                padding: 65px 18px;
+            }
+
+            .dashboard-panel {
+                padding: 12px;
+            }
+
+            .dashboard-heading {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .tableau-container {
+                min-height: 650px;
+            }
+
+            .tableauViz {
+                min-height: 650px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <nav>
+        <div class="logo">⚡ EV INSIGHTS</div>
+
+        <div>
+            <a href="#home">Home</a>
+            <a href="#features">Features</a>
+            <a href="#dashboard">Dashboard</a>
+            <a href="#about">About</a>
+        </div>
+    </nav>
+</header>
+
+<main>
+
+    <!-- HOME SECTION -->
+    <section class="hero" id="home">
+
+        <div class="tag">
+            ELECTRIC MOBILITY · DATA ANALYTICS
+        </div>
+
+        <h1>
+            Electric Vehicle Market<br>
+            Performance &amp; Insights
+        </h1>
+
+        <p>
+            Explore electric vehicle market performance through
+            interactive data visualizations. Discover patterns
+            and insights using the Tableau dashboard.
+        </p>
+
+        <div>
+            <a class="button" href="#dashboard">
+                Explore Dashboard ↓
+            </a>
+
+            <a
+                class="button button-outline"
+                href="https://public.tableau.com/app/profile/anika.kharya/viz/Book1_17931081363880/Dashboard1?publish=yes"
+                target="_blank"
+                rel="noopener noreferrer">
+                Open Tableau Public ↗
+            </a>
+        </div>
+
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section id="features">
+
+        <h2 class="section-title">Project Highlights</h2>
+
+        <p class="section-description">
+            An interactive EV analytics project designed to make
+            market data easier to explore and understand.
+        </p>
+
+        <div class="features">
+
+            <div class="card">
+                <div class="icon">📊</div>
+                <h3>Market Analysis</h3>
+                <p>
+                    Explore market indicators and comparisons
+                    included in the electric vehicle dashboard.
+                </p>
+            </div>
+
+            <div class="card">
+                <div class="icon">⚡</div>
+                <h3>Electric Mobility</h3>
+                <p>
+                    Learn about the electric vehicle market
+                    through the data presented in the project.
+                </p>
+            </div>
+
+            <div class="card">
+                <div class="icon">🔎</div>
+                <h3>Interactive Insights</h3>
+                <p>
+                    Use the available Tableau filters and controls
+                    to explore the dashboard visualizations.
+                </p>
+            </div>
+
+            <div class="card">
+                <div class="icon">📈</div>
+                <h3>Data Visualization</h3>
+                <p>
+                    View charts and visual summaries that help
+                    communicate patterns in the available data.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- DASHBOARD SECTION -->
+    <section class="dashboard-section" id="dashboard">
+
+        <h2 class="section-title">Interactive EV Dashboard</h2>
+
+        <p class="section-description">
+            Explore the EV Market Data dashboard directly below.
+            You can also open the complete visualization on Tableau Public.
+        </p>
+
+        <div class="dashboard-panel">
+
+            <div class="dashboard-heading">
+                <h3>EV Market Data</h3>
+                <span class="status">Tableau Public Dashboard</span>
+            </div>
+
+            <!-- Tableau embed -->
+            <div class="tableau-container">
+
+                <div
+                    class="tableauPlaceholder"
+                    id="viz1793284316207">
+
+                    <noscript>
+                        <a
+                            href="https://public.tableau.com/app/profile/anika.kharya/viz/Book1_17931081363880/Dashboard1?publish=yes"
+                            target="_blank"
+                            rel="noopener noreferrer">
+
+                            <img
+                                alt="EV Market Data Dashboard"
+                                src="https://public.tableau.com/static/images/Bo/Book1_17931081363880/Dashboard1/1_rss.png"
+                                style="border:none; width:100%;"
+                            />
+                        </a>
+                    </noscript>
+
+                    <object class="tableauViz">
+
+                        <param
+                            name="host_url"
+                            value="https%3A%2F%2Fpublic.tableau.com%2F"
+                        />
+
+                        <param
+                            name="embed_code_version"
+                            value="3"
+                        />
+
+                        <param name="site_root" value="" />
+
+                        <param
+                            name="name"
+                            value="Book1_17931081363880/Dashboard1"
+                        />
+
+                        <param name="tabs" value="no" />
+
+                        <param name="toolbar" value="yes" />
+
+                        <param
+                            name="static_image"
+                            value="https://public.tableau.com/static/images/Bo/Book1_17931081363880/Dashboard1/1.png"
+                        />
+
+                        <param name="animate_transition" value="yes" />
+                        <param name="display_static_image" value="yes" />
+                        <param name="display_spinner" value="yes" />
+                        <param name="display_overlay" value="yes" />
+                        <param name="display_count" value="yes" />
+                        <param name="language" value="en-US" />
+                        <param name="filter" value="publish=yes" />
+
+                    </object>
+                </div>
+
+            </div>
+
+            <p class="dashboard-note">
+                If the dashboard does not load, use the button below
+                to open it directly on Tableau Public.
+            </p>
+
+            <div style="text-align:center; margin-top:18px;">
+
+                <a
+                    class="button"
+                    href="https://public.tableau.com/app/profile/anika.kharya/viz/Book1_17931081363880/Dashboard1?publish=yes"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    Open Full Dashboard ↗
+                </a>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="about">
+
+        <h2 class="section-title">About the Project</h2>
+
+        <p class="section-description">
+            Learn about the purpose and technology behind this website.
+        </p>
+
+        <div class="about-box">
+
+            <p>
+                <strong>
+                    Electric Vehicle Market Performance &amp; Insights
+                </strong>
+                is a data analytics and visualization project
+                presented through Tableau Public.
+            </p>
+
+            <p>
+                This website provides a dedicated place to explore
+                the EV dashboard, understand the available
+                visualizations, and access the original Tableau project.
+            </p>
+
+            <p>
+                <strong>Technology used:</strong>
+                HTML, CSS, JavaScript and Tableau Public.
+            </p>
+
+            <p>
+                <strong>Project purpose:</strong>
+                To present electric vehicle market data in an
+                accessible and interactive dashboard format.
+            </p>
+
+            <div class="project-details">
+                <p><strong>Project:</strong> EV Market Data</p>
+                <p><strong>Visualization platform:</strong> Tableau Public</p>
+                <p>
+                    <strong>Dashboard:</strong>
+                    <a
+                        href="https://public.tableau.com/app/profile/anika.kharya/viz/Book1_17931081363880/Dashboard1?publish=yes"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        View Tableau Dashboard
+                    </a>
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+    <p><strong>⚡ EV INSIGHTS</strong></p>
+    <p>Electric Vehicle Market Performance &amp; Insights</p>
+    <p>Dashboard powered by Tableau Public</p>
+    <p>© 2026 EV Insights</p>
+</footer>
+
+<!-- Load Tableau's official embedding script -->
+<script type="text/javascript">
+    (function () {
+        var container = document.getElementById("viz1793284316207");
+        var viz = container.querySelector("object.tableauViz");
+
+        function resizeDashboard() {
+            if (window.innerWidth <= 500) {
+                viz.style.width = "100%";
+                viz.style.height = "2827px";
+            } else {
+                viz.style.width = "100%";
+
+                var height = container.offsetWidth * 0.75;
+                height = Math.max(587, Math.min(height, 1587));
+
+                viz.style.height = height + "px";
+            }
+        }
+
+        resizeDashboard();
+        window.addEventListener("resize", resizeDashboard);
+
+        var script = document.createElement("script");
+        script.src =
+            "https://public.tableau.com/javascripts/api/viz_v1.js";
+
+        viz.parentNode.insertBefore(script, viz);
+    })();
+</script>
+
+</body>
+</html>
